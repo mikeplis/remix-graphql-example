@@ -1,15 +1,15 @@
-import { gql } from "@apollo/client";
-import type { LoaderFunction } from "remix";
+import { Link, LoaderFunction } from "remix";
 import { useLoaderData } from "remix";
-import { client, Joke } from "~/graphql";
+import type { Joke } from "~/lib/graphql";
+import { graphql } from "~/lib/graphql";
 
 type LoaderData = {
     jokes: Joke[];
 };
 
 export let loader: LoaderFunction = async () => {
-    const result = await client.query({
-        query: gql`
+    const result = await graphql({
+        query: `
             query {
                 jokes {
                     id
@@ -21,8 +21,7 @@ export let loader: LoaderFunction = async () => {
 
     return result.data;
 };
-// https://remix.run/guides/routing#index-routes
-export default function Index() {
+export default function Jokes() {
     let { jokes } = useLoaderData<LoaderData>();
 
     return (
@@ -30,7 +29,9 @@ export default function Index() {
             <h1>Hello world</h1>
             <ul>
                 {jokes.map((joke) => (
-                    <li key={joke.id}>{joke.content}</li>
+                    <li key={joke.id}>
+                        <Link to={joke.id}>{joke.content}</Link>
+                    </li>
                 ))}
             </ul>
         </div>
